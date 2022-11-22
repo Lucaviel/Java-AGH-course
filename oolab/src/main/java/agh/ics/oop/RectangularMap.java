@@ -3,11 +3,11 @@ package agh.ics.oop;
 import java.util.ArrayList;
 import java.util.List;
 
-class RectangularMap implements IWorldMap{
+class RectangularMap extends AbstractWorldMap{
 
-    private int width;
-    private int height;
-    private List<Animal> animals = new ArrayList<>();
+    private final int width;
+    private final int height;
+    private final List<Animal> animals = new ArrayList<>();
 
     public RectangularMap(int width, int height){
         this.width = width;

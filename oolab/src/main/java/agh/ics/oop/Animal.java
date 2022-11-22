@@ -1,11 +1,11 @@
 package agh.ics.oop;
 
-public class Animal {
+public class Animal extends AbstractWorldMapElement {
 
     //private static final Vector2d LOWER_BOUND = new Vector2d(0,0)
-    private Vector2d position;
+    //private Vector2d position;
     private MapDirection orientation;
-    private IWorldMap map;
+    private final IWorldMap map;
 
     public Animal(IWorldMap map){
         this.orientation = MapDirection.NORTH;
@@ -23,9 +23,9 @@ public class Animal {
         return orientation;
     }
 
-    public Vector2d getPosition() {
-        return position;
-    }
+//    public Vector2d getPosition() {
+//        return position;
+//    }
 
     public String toString() {
         return switch(this.orientation) {
@@ -36,25 +36,10 @@ public class Animal {
         };
     }
 
-    public boolean isAt(Vector2d position) {
-        return this.position.equals(position);
-    }   /*Objects.equals(this.position, other.position)*/
+//    public boolean isAt(Vector2d position) {
+//        return this.position.equals(position);
+//    }   /*Objects.equals(this.position, other.position)*/
 
-    /*   public void move(MoveDirection direction){
-           switch (direction) {
-                   case LEFT -> this.orientation = this.orientation.previous();
-                   case RIGHT -> this.orientation = this.orientation.next();
-                   case FORWARD -> this.position = this.position.add(this.orientation.toUnitVector());
-                   case BACKWARD -> this.position = this.position.subtract(this.orientation.toUnitVector());
-           }
-
-           if(!(this.position.precedes(new Vector2d(4,4))) && !(this.position.follows(new Vector2d(0,0)))){
-               switch(direction){
-                   case FORWARD -> this.position = this.position.add(this.orientation.toUnitVector().opposite());
-                   case BACKWARD -> this.position = this.position.subtract(this.orientation.toUnitVector().opposite());
-               }
-           }
-       }*/
     public void move(MoveDirection direction) {
         switch (direction) {
             case LEFT -> this.orientation = this.orientation.previous();
