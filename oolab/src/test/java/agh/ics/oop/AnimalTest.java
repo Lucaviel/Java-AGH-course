@@ -1,49 +1,54 @@
 package agh.ics.oop;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AnimalTest {
+
     @Test
     void OrientationTest(){
-        Animal pet1 = new Animal(new Vector2d(3, 2), MapDirection.WEST);
-        Animal pet2 = new Animal(new Vector2d(3, 1), MapDirection.SOUTH);
+        IWorldMap map1 = new RectangularMap(3,2);
+        Animal pet1 = new Animal(map1);
+        IWorldMap map2 = new RectangularMap(3,1);
+        Animal pet2 = new Animal(map2);
+
         pet2.move(MoveDirection.LEFT);
-        assertEquals(MapDirection.WEST, pet1.getOrientation());
-        assertEquals(MapDirection.EAST, pet2.getOrientation());
+        assertEquals(MapDirection.NORTH, pet1.getOrientation());
+        assertEquals(MapDirection.WEST, pet2.getOrientation());
     }
 
     @Test
     void PositionMoveTest(){
-        Animal pet1 = new Animal(new Vector2d(2, 2), MapDirection.EAST);
-        Animal pet2 = new Animal(new Vector2d(3, 1), MapDirection.SOUTH);
+        IWorldMap map1 = new RectangularMap(2,2);
+        Animal pet1 = new Animal(map1);
+
         pet1.move(MoveDirection.FORWARD);
-        pet2.move(MoveDirection.RIGHT);
-        pet2.move(MoveDirection.BACKWARD);
-        assertEquals(new Vector2d(3,2), pet1.getPosition());
-        assertEquals(new Vector2d(4,1), pet2.getPosition());
+        assertEquals(new Vector2d(2,2), pet1.getPosition());
     }
 
     @Test
     void OutOfTheMapTest(){
-        Animal animal1 = new Animal(new Vector2d(4, 4), MapDirection.EAST);
+        IWorldMap map1 = new RectangularMap(4,4);
+        Animal animal1 = new Animal(map1);
+        IWorldMap map2 = new RectangularMap(0,0);
+        Animal animal2 = new Animal(map2);
+
         animal1.move(MoveDirection.FORWARD);
-        Animal animal2 = new Animal(new Vector2d(0, 0), MapDirection.NORTH);
         animal2.move(MoveDirection.BACKWARD);
-        assertTrue(animal1.isAt(new Vector2d(4,4)));
-        assertTrue(animal2.isAt(new Vector2d(0,0)));
+        assertFalse(animal1.isAt(new Vector2d(4,4)));
+        assertFalse(animal2.isAt(new Vector2d(0,0)));
     }
 
     @Test
     void InputTest(){
-        Animal animal1 = new Animal(new Vector2d(2, 2), MapDirection.NORTH);
+        IWorldMap map1 = new RectangularMap(2,2);
+        Animal animal1 = new Animal(map1);
+
         String[] input = {"r", "f", "f", "f"};
         MoveDirection[] newargs = OptionsParser.parser(input);
         for(MoveDirection direction: newargs){
             animal1.move(direction);
         }
-        assertEquals("Position: (4, 2), Orientation: Wschód", animal1.toString());
+        assertEquals("E", animal1.toString());
     }
 }
