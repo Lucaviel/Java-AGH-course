@@ -1,6 +1,6 @@
 package agh.ics.oop;
 
-class SimulationEngine implements IEngine{
+public class SimulationEngine implements IEngine{
 
     private final MoveDirection[] directions;
     private final IWorldMap map;
@@ -10,7 +10,7 @@ class SimulationEngine implements IEngine{
         this.map = map;
         for (Vector2d p : positions) {
             Animal animal=new Animal(map, p);
-            animal.addObserver((IPositionChangeObserver) map);
+            animal.addObserver(map);
             map.place(animal);
         }
     }
