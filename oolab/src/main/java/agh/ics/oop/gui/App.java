@@ -3,84 +3,115 @@ package agh.ics.oop.gui;
 import agh.ics.oop.*;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.*;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
-import java.util.List;
-
-public class App extends Application {
-    private Label label;
+public class App extends Application implements IPositionChangeObserver{
     private GridPane grid = new GridPane();
-    private IWorldMap map;
+    VBox box;
+    private GrassField map;
+    private static final int width = 600;
+    private static final int moveDelay = 300;
+    private static final int height = 600;
+    private static final int cellWidth = 40;
+    private static final int cellHeight = 40;
 
-    private String drawObject(Vector2d currentPosition) {
-        String result = null;
-        if (this.map.isOccupied(currentPosition)) {
-            Object object = this.map.objectAt(currentPosition);
-            if (object != null) {
-                result = object.toString();
-            } else {
-                result = " ";
-            }
-        } else {
-            result = " ";
-        }
-        return result;
-    }
-
-    public void start(Stage primaryStage) throws IllegalArgumentException{
-        List<String> arguments = getParameters().getRaw();
-        String[] args = arguments.toArray(new String[0]);
-        MoveDirection[] directions2 = new OptionsParser().parser(args);
-        AbstractWorldMap map = new GrassField(10);
-        this.map = map;
-        Vector2d[] positions2 = {new Vector2d(2, 2), new Vector2d(3, 4)};
-        IEngine engine2 = new SimulationEngine(directions2, map, positions2);
-        engine2.run();
-
-        grid.setGridLinesVisible(true);
-        GrassField myMap = (GrassField) map;
-
-        int haveToiterateY = myMap.getUpperRightDrawLimit().y - myMap.getLowerLeftDrawLimit().y;
-        int haveToiterateX = myMap.getUpperRightDrawLimit().x - myMap.getLowerLeftDrawLimit().x;
-
-        for (int i = 0; i <= haveToiterateY; i++) {
-            Integer newInt = myMap.getUpperRightDrawLimit().y-i;
-            label = new Label(newInt.toString());
-            grid.getColumnConstraints().add(new ColumnConstraints(20));
-            grid.getRowConstraints().add(new RowConstraints(20));
-            grid.add(label, 0, i+1);
-
-            GridPane.setHalignment(label, HPos.CENTER);
-            for (int k = 0; k < haveToiterateX+1; k++) {
-                if (i == 0) {
-                    newInt = myMap.getLowerLeftDrawLimit().x + k;
-                    label = new Label(newInt.toString());
-                    grid.add(label, k+1, 0);
-                    GridPane.setHalignment(label, HPos.CENTER);
-                }
-                String result = drawObject(new Vector2d(k+myMap.getLowerLeftDrawLimit().x , i+myMap.getLowerLeftDrawLimit().y));
-                label = new Label(result);
-                grid.add(label, k+1, haveToiterateY-i+1);
-                GridPane.setHalignment(label, HPos.CENTER);
-            }
-        }
-
-        label = new Label("x/y");
-        grid.getColumnConstraints().add(new ColumnConstraints(20));
-        grid.getRowConstraints().add(new RowConstraints(20));
-        grid.add(label, 0, 0);
-        GridPane.setHalignment(label, HPos.CENTER);
-        Scene scene = new Scene(grid, (haveToiterateX+2)*20, (haveToiterateY+2)*20);
+    public void start(Stage primaryStage) throws IllegalArgumentException {
+        this.grid.setGridLinesVisible(true);
+        this.grid.setAlignment(Pos.BASELINE_CENTER);
+        Button btn = new Button();
+        btn.setText("Start");
+        final TextField textField = new TextField();
+        HBox hBox = new HBox(10);
+        hBox.getChildren().add(textField);
+        hBox.getChildren().add(btn);
+        hBox.setAlignment(Pos.BASELINE_CENTER);
+        VBox vBox = new VBox(20);
+        vBox.getChildren().add(grid);
+        vBox.getChildren().add(hBox);
+        vBox.setAlignment(Pos.CENTER);
+        Scene scene = new Scene(vBox, width, height);
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        System.out.println();
-
+        try {
+            map = new GrassField(10);
+            Vector2d[] positions = {new Vector2d(2, 2), new Vector2d(3, 4)};
+            SimulationEngine engine = new SimulationEngine(this.map, positions, this);
+            engine.setDelay(moveDelay);
+            Thread firstThread = new Thread(engine);
+            firstThread.start();
+            btn.setOnAction((e) -> {
+                Thread engineThread = new Thread(engine);
+                String textFieldText = textField.getText();
+                String[] args = textFieldText.split(" ");
+                OptionsParser optionParser = new OptionsParser();
+                MoveDirection[] directions = optionParser.parser(args);
+                engine.setMoves(directions);
+                engineThread.start();
+            });
+        } catch (IllegalArgumentException ex) {
+            System.out.println(ex.toString());
+        }
     }
+
+    public void render () {
+        Platform.runLater(() -> {
+            Node gr = grid.getChildren().get(0);
+            grid.getRowConstraints().clear();
+            grid.getColumnConstraints().clear();
+            grid.getChildren().clear();
+            grid.add(gr, 0, 0);
+            grid.setGridLinesVisible(true);
+            int minY = this.map.getLowerLeftDrawLimit().y;
+            int minX = this.map.getLowerLeftDrawLimit().x;
+            int maxY = this.map.getUpperRightDrawLimit().y;
+            int maxX = this.map.getUpperRightDrawLimit().x;
+
+            Label xyLabel = new Label("y\\x");
+            GridPane.setHalignment(xyLabel, HPos.CENTER);
+            grid.getColumnConstraints().add(new ColumnConstraints(cellWidth));
+            grid.getRowConstraints().add(new RowConstraints(cellHeight));
+            grid.add(xyLabel, 0, 0, 1, 1);
+            for (int i = minY; i <= maxY; i++) {
+                Label label2 = new Label(Integer.toString(i));
+                grid.add(label2, 0, maxY - i + 1, 1, 1);
+                grid.getRowConstraints().add(new RowConstraints(cellHeight));
+                GridPane.setHalignment(label2, HPos.CENTER);
+            }
+            for (int i = minX; i <= maxX; i++) {
+                Label label3 = new Label(Integer.toString(i));
+                grid.add(label3, i - minX + 1, 0, 1, 1);
+                grid.getColumnConstraints().add(new ColumnConstraints(cellWidth));
+                GridPane.setHalignment(label3, HPos.CENTER);
+            }
+            int x = 0;
+            int y = 0;
+            for (int a = minX; a <= maxX; a++) {
+                x += 1;
+                y = 0;
+                for (int b = maxY; b >= minY; b--) {
+                    y += 1;
+                    Object obiekt = map.objectAt(new Vector2d(a, b));
+                    if (obiekt != null) {
+                        AbstractWorldMapElement el = (AbstractWorldMapElement) obiekt;
+                        box = new GuiElementBox(el).show();
+                        grid.add(box, x, y, 1, 1);
+                    }
+                }
+            } });
+        }
+        @Override
+        public void positionChanged (Vector2d oldPosition, Vector2d newPosition){
+            this.render();
+        }
 }
+

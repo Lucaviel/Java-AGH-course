@@ -17,6 +17,16 @@ public class Animal extends AbstractWorldMapElement {
         this.map = map;
     }
 
+    @Override
+    public String getName() {
+        return switch (this.orientation) {
+            case NORTH -> "up";
+            case EAST -> "right";
+            case SOUTH -> "down";
+            case WEST -> "left";
+        };
+    }
+
     public String toString() {
         return switch(this.orientation) {
             case NORTH -> "N";
