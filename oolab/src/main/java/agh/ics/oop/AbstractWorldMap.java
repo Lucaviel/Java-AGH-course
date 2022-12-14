@@ -2,19 +2,20 @@ package agh.ics.oop;
 
 import java.util.*;
 
-abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
-
-    final Vector2d start_vector = new Vector2d(0,0);
+public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
     protected List<Animal> animalsList = new ArrayList<>();
     protected Map<Vector2d, Animal> animalsMap = new HashMap<>();
+    protected MapBoundary mapBoundary=new MapBoundary();
 
     @Override
     public boolean place(Animal animal) {
         if (this.animalsMap.get(animal.getPosition()) != null) {
-            return false;
+            //return false;
+            throw new IllegalArgumentException(animal.getPosition()+ " is already occupied");
         }
         this.animalsList.add(animal);
         this.animalsMap.put(animal.getPosition(),animal);
+        mapBoundary.put(animal);
         return true;
     }
 
@@ -31,7 +32,7 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
 
     @Override
     public boolean canMoveTo(Vector2d position) {
-        return (!animalsMap.containsKey(position));
+        return !animalsMap.containsKey(position);
     }
 
     @Override
@@ -41,6 +42,20 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
             animalsMap.put(newPosition, a);
         }
     }
+
+    public Vector2d getLowerLeftDrawLimit(){
+        this.mapBoundary.sortComparator();
+        int x = this.mapBoundary.xEl.get(0).getPosition().x;
+        int y = this.mapBoundary.yEl.get(0).getPosition().y;
+        return new Vector2d(x,y);
+    }
+    public Vector2d getUpperRightDrawLimit(){
+        this.mapBoundary.sortComparator();
+        int x = this.mapBoundary.xEl.get(this.mapBoundary.xEl.size()-1).getPosition().x;
+        int y = this.mapBoundary.yEl.get(this.mapBoundary.yEl.size()-1).getPosition().y;
+        return new Vector2d(x,y);
+    }
+
     public List<Animal> getAnimals(){
         return this.animalsList;
     }
