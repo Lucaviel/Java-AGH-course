@@ -5,6 +5,10 @@ public class Grass extends AbstractWorldMapElement {
         this.position = position;
     }
     @Override
+    public String getName(){
+        return "grass";
+    }
+    @Override
     public String toString(){
         return "*";
     }
