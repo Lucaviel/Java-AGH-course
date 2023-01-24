@@ -1,7 +1,7 @@
 package agh.ics.oop;
 
 public class OptionsParser {
-    public static MoveDirection[] parser(String[] args){
+    public static MoveDirection[] parser(String[] args) throws IllegalArgumentException {
         //returnStream.of(input)
         //  .map(instruction -> switch (instruction){
         //      case "f", "forward" -> news[i] = MoveDirection.FORWARD;
@@ -19,7 +19,7 @@ public class OptionsParser {
                 case "b", "backward" -> news[i] = MoveDirection.BACKWARD;
                 case "r", "right" -> news[i] = MoveDirection.RIGHT;
                 case "l", "left" -> news[i] = MoveDirection.LEFT;
-                default -> throw new IllegalArgumentException( "Nieprawidłowa instrukcja!" );
+                default -> throw new IllegalArgumentException(arg + " is not legal move specification" );
             };
             i++;
         }

@@ -1,5 +1,7 @@
 package agh.ics.oop;
 
+import java.util.List;
+
 /**
  * The interface responsible for interacting with the map of the world.
  * Assumes that Vector2d and MoveDirection classes are defined.
@@ -7,7 +9,7 @@ package agh.ics.oop;
  * @author apohllo
  *
  */
-public interface IWorldMap {
+public interface IWorldMap extends IPositionChangeObserver {
     /**
      * Indicate if any object can move to the given position.
      *
@@ -24,7 +26,7 @@ public interface IWorldMap {
      *            The animal to place on the map.
      * @return True if the animal was placed. The animal cannot be placed if the map is already occupied.
      */
-    boolean place(Animal animal);
+    void place(Animal animal);
 
     /**
      * Return true if given position on the map is occupied. Should not be
@@ -45,4 +47,6 @@ public interface IWorldMap {
      * @return Object or null if the position is not occupied.
      */
     Object objectAt(Vector2d position);
+    MapBoundary getBound();
+    List<Animal> getAnimals();
 }

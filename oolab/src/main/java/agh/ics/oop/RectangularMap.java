@@ -13,14 +13,12 @@ class RectangularMap extends AbstractWorldMap{
         this.width = width;
         this.height = height;
     }
-
     public boolean canMoveTo(Vector2d position){
         if ( !(position.follows(new Vector2d(0,0))) || !(position.precedes(new Vector2d(this.width,this.height))) ){
             return false;
         }
         return !isOccupied(position);
     }
-
     public boolean isOccupied(Vector2d position){
         for (Animal i: animals){
             if (i.getPosition().equals(position))
@@ -28,14 +26,10 @@ class RectangularMap extends AbstractWorldMap{
         }
         return false;
     }
-
-    public boolean place(Animal animal){
+    public void place(Animal animal){
         if (isOccupied(animal.getPosition()))
-            return false;
-        animals.add(animal);
-        return true;
+            animals.add(animal);
     }
-
     public Object objectAt(Vector2d position){
         for (Animal i: animals){
             if (i.getPosition().equals(position))
